@@ -163,7 +163,17 @@ function optimizePrompt(promptText) {
     .then(response => response.json())
     .then(data => {
       loading.style.display = 'none';
-      optimizedPrompt.value = data.choices[0].message.content;
+      const result = data.choices[0].message.content;
+      let index = 0;
+      const typingSpeed = 5; 
+      const typingInterval = setInterval(() => {
+        if (index < result.length) {
+          optimizedPrompt.value += result.charAt(index);
+          index++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, typingSpeed);
     })
     .catch(error => {
       console.error('Error:', error);
