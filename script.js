@@ -14,6 +14,25 @@ const apiKeyInput = document.getElementById('api-key-input');
 const saveButton = document.getElementById('save-button');
 const clearButton = document.getElementById('clear-button');
 const copyApiKeyButton = document.getElementById('copy-api-key-button');
+const apiKeyMessage = document.getElementById('api-key-message');
+
+function checkApiKey() {
+    const apiKey = localStorage.getItem('apiKey');
+    if (!apiKey) {
+      promptInput.disabled = true;
+      promptInput.placeholder = 'Please click the gear icon to set your API key.';
+    } else {
+      promptInput.disabled = false;
+      promptInput.placeholder = 'Please enter what you would like LLMs to do...';
+    }
+  }
+  
+  window.addEventListener('DOMContentLoaded', checkApiKey);
+  
+  settingsIcon.addEventListener('click', () => {
+    settingsModal.style.display = 'block';
+    apiKeyInput.value = localStorage.getItem('apiKey') || '';
+  });
 
 settingsIcon.addEventListener('click', () => {
     settingsModal.style.display = 'block';
@@ -162,3 +181,38 @@ acceptButton.addEventListener('click', () => {
   promptInput.value = optimizedPrompt.value;
   closeModal();
 });
+
+saveButton.addEventListener('click', () => {
+    const apiKey = apiKeyInput.value.trim();
+    if (apiKey !== '') {
+      localStorage.setItem('apiKey', apiKey);
+      settingsModal.style.display = 'none';
+      apiKeyMessage.textContent = 'API key saved successfully!';
+      apiKeyMessage.classList.remove('hidden');
+      setTimeout(() => {
+        apiKeyMessage.classList.add('hidden');
+      }, 3000);
+      checkApiKey();
+    }
+  });
+  
+  clearButton.addEventListener('click', () => {
+    apiKeyInput.value = '';
+    localStorage.removeItem('apiKey');
+    apiKeyMessage.textContent = 'API key cleared successfully!';
+    apiKeyMessage.classList.remove('hidden');
+    setTimeout(() => {
+      apiKeyMessage.classList.add('hidden');
+    }, 3000);
+    checkApiKey();
+  });
+  
+  copyApiKeyButton.addEventListener('click', () => {
+    apiKeyInput.select();
+    document.execCommand('copy');
+    apiKeyMessage.textContent = 'API key copied to clipboard!';
+    apiKeyMessage.classList.remove('hidden');
+    setTimeout(() => {
+      apiKeyMessage.classList.add('hidden');
+    }, 3000);
+  });
