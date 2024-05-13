@@ -121,7 +121,7 @@ function optimizePrompt(promptText) {
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
   const requestBody = {
-    model: 'gpt-4-turbo',
+    model: 'gpt-4o',
     messages: [
       {
         role: 'system',
