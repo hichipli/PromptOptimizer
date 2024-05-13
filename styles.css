@@ -214,3 +214,11 @@ button {
 #api-key-message.hidden {
   display: none;
 }
+
+.note {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  text-align: left;
+}
