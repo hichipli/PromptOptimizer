@@ -1,57 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="h-full">
 <head>
-  <title>LLMs Prompt Optimizer</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLMs Prompt Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-  <div class="container">
-    <div class="floating-window">
-      <div class="title">
-        LLMs Prompt Optimizer
-        <i id="settings-icon" class="fas fa-cog"></i>
-      </div>
-      <div class="note">Note: Updated to GPT-4o model (05/13/2024)</div>
-      <textarea id="prompt-input" placeholder="Please enter what you would like AI to do..."></textarea>
-      <div class="button-container">
-        <button id="optimize-button" disabled>
-          <span class="tooltip">Auto-optimize your prompt.</span>
-          Optimize
-        </button>
-        <button id="copy-button" class="hidden"><i class="far fa-copy"></i></button>
-        <button id="copied-button" class="hidden"><i class="fas fa-check"></i></button>
-      </div>
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-3xl">
+        <div class="bg-white rounded-lg shadow-lg p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">LLMs Prompt Optimizer</h1>
+                <button id="settings-icon" class="text-gray-600 hover:text-primary transition-colors">
+                    <i class="fas fa-cog text-xl"></i>
+                </button>
+            </div>
+            <p class="text-sm text-gray-600">Note: All new UI (07/06/2024) / Updated to GPT-4o model (05/13/2024)</p>
+            <textarea id="prompt-input" class="w-full h-40 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Please enter what you would like AI to do..."></textarea>
+            <div class="flex justify-between items-center">
+                <button id="optimize-button" class="bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Optimize
+                </button>
+                <div>
+                    <button id="copy-button" class="hidden bg-secondary text-white px-3 py-2 rounded-md hover:bg-green-600 transition-colors">
+                        <i class="far fa-copy"></i>
+                    </button>
+                    <button id="copied-button" class="hidden bg-green-600 text-white px-3 py-2 rounded-md">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <div id="loading" class="loading">
-        <div class="loading-text">Optimizing Prompt...</div>
-        <div class="spinner"></div>
-      </div>
-      <textarea id="optimized-prompt"></textarea>
-      <button id="retry-button">Retry</button>
-      <button id="accept-button">Accept</button>
-      <button id="cancel-button">Cancel</button>
+    <footer class="mt-8 text-center text-sm text-gray-600">
+        <p>&copy; 2024 <a href="https://education.ufl.edu/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">University of Florida College of Education</a></p>
+        <p>Developed jointly by Dr. Anthony F. Botelho's Lab and the GAME Lab</p>
+        <p>All rights reserved.</p>
+    </footer>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-auto max-h-[90vh] overflow-y-auto">
+            <div id="loading" class="text-center mb-4 hidden">
+                <div class="text-lg mb-2">Optimizing Prompt...</div>
+                <div class="spinner"></div>
+            </div>
+            <textarea id="optimized-prompt" class="w-full h-40 p-2 border border-gray-300 rounded-md mb-4"></textarea>
+            <div class="flex justify-end space-x-2">
+                <button id="retry-button" class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition-colors">Retry</button>
+                <button id="accept-button" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Accept</button>
+                <button id="cancel-button" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">Cancel</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div id="settings-modal" class="modal">
-    <div class="modal-content">
-      <h2>Settings</h2>
-      <label for="api-key-input">OpenAI API Key:</label>
-      <input type="text" id="api-key-input" placeholder="Enter your API key">
-      <div class="settings-button-container">
-        <button id="save-button">Save</button>
-        <button id="clear-button">Clear</button>
-        <button id="copy-api-key-button">Copy</button>
-      </div>
-      <div id="api-key-message" class="hidden"></div>
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-auto">
+            <h2 class="text-xl font-bold mb-4">Settings</h2>
+            <label for="api-key-input" class="block mb-2">OpenAI API Key:</label>
+            <input type="text" id="api-key-input" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Enter your API key">
+            <div class="flex justify-between">
+                <button id="save-button" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">Save</button>
+                <button id="clear-button" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">Clear</button>
+                <button id="copy-api-key-button" class="bg-secondary text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Copy</button>
+            </div>
+            <div id="api-key-message" class="mt-4 p-2 bg-red-100 text-red-800 rounded-md hidden"></div>
+        </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <style>
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4F46E5;
+            animation: spin 1s ease infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script src="script.js"></script>
 </body>
 </html>
