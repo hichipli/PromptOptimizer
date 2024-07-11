@@ -15,6 +15,52 @@ const saveButton = document.getElementById('save-button');
 const clearButton = document.getElementById('clear-button');
 const copyApiKeyButton = document.getElementById('copy-api-key-button');
 const apiKeyMessage = document.getElementById('api-key-message');
+const chatgptTooltip = document.getElementById('chatgpt-tooltip');
+const chatgptButton = document.getElementById('chatgpt-button');
+let optimizedPromptText = '';
+
+chatgptButton.addEventListener('mouseenter', () => {
+  chatgptTooltip.classList.remove('invisible', 'opacity-0');
+  chatgptTooltip.classList.add('opacity-100');
+});
+
+chatgptButton.addEventListener('mouseleave', () => {
+  chatgptTooltip.classList.add('invisible', 'opacity-0');
+  chatgptTooltip.classList.remove('opacity-100');
+});
+
+window.addEventListener('resize', adjustTooltipPosition);
+
+function adjustTooltipPosition() {
+    const buttonRect = chatgptButton.getBoundingClientRect();
+    chatgptTooltip.style.left = `${buttonRect.width / 2}px`;
+    chatgptTooltip.style.top = `${-chatgptTooltip.offsetHeight - 10}px`;
+}
+
+window.addEventListener('DOMContentLoaded', adjustTooltipPosition);
+
+function showButtons() {
+  if (promptInput.value.trim() !== '') {
+      copyButton.classList.remove('hidden');
+      copiedButton.classList.add('hidden');
+  } else {
+      copyButton.classList.add('hidden');
+      copiedButton.classList.add('hidden');
+  }
+}
+
+promptInput.addEventListener('input', showButtons);
+
+chatgptButton.addEventListener('click', () => {
+  navigator.clipboard.writeText(optimizedPromptText).then(() => {
+      alert('Optimized prompt copied to clipboard. Please paste it into ChatGPT.');
+      window.open(`https://chat.openai.com/`, '_blank');
+  }).catch(err => {
+      console.error('Failed to copy text: ', err);
+      alert('Failed to copy the prompt. Please copy it manually before proceeding to ChatGPT.');
+      window.open(`https://chat.openai.com/`, '_blank');
+  });
+});
 
 function checkApiKey() {
     const apiKey = localStorage.getItem('apiKey');
@@ -95,16 +141,19 @@ function openModal(promptText) {
 
 function closeModal() {
   modal.style.display = 'none';
+  // Disable ChatGPT button when modal is closed without accepting
+  chatgptButton.disabled = true;
+  chatgptButton.classList.add('opacity-50', 'cursor-not-allowed');
 }
 
 function toggleOptimizeButton() {
-    if (promptInput.value.trim() !== '') {
+  if (promptInput.value.trim() !== '') {
       optimizeButton.disabled = false;
-    } else {
+  } else {
       optimizeButton.disabled = true;
-    }
-    showCopyButton();
   }
+  showButtons();
+}
   
   promptInput.addEventListener('input', toggleOptimizeButton);
 
@@ -143,7 +192,9 @@ function optimizePrompt(promptText) {
   - The games should be instructive, amusing, and gripping.
   - Stick to developing games that don't necessitate any special equipment or tools.
   - Maintain the intricacy level apt for a broad audience.
-  - Every game should be delineated through clear, easy-to-understand instructions.`
+  - Every game should be delineated through clear, easy-to-understand instructions.
+  ## Finished
+  - If you understand, please respond with "Yes, please start the conversation."`
       },
       {
         role: 'user',
@@ -164,17 +215,18 @@ function optimizePrompt(promptText) {
     .then(data => {
       loading.style.display = 'none';
       const result = data.choices[0].message.content;
+      optimizedPromptText = result; 
       let index = 0;
       const typingSpeed = 5; 
       const typingInterval = setInterval(() => {
-        if (index < result.length) {
-          optimizedPrompt.value += result.charAt(index);
-          index++;
-        } else {
-          clearInterval(typingInterval);
-        }
+          if (index < result.length) {
+              optimizedPrompt.value += result.charAt(index);
+              index++;
+          } else {
+              clearInterval(typingInterval);
+          }
       }, typingSpeed);
-    })
+  })
     .catch(error => {
       console.error('Error:', error);
       loading.style.display = 'none';
@@ -189,7 +241,10 @@ retryButton.addEventListener('click', () => {
 
 acceptButton.addEventListener('click', () => {
   promptInput.value = optimizedPrompt.value;
+  optimizedPromptText = optimizedPrompt.value; 
   closeModal();
+  chatgptButton.disabled = false;
+  chatgptButton.classList.remove('opacity-50', 'cursor-not-allowed');
 });
 
 saveButton.addEventListener('click', () => {

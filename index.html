@@ -55,6 +55,47 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .tooltip {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        .tooltip-arrow,
+        .tooltip-arrow::before {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: inherit;
+        }
+
+        .tooltip-arrow {
+            visibility: hidden;
+        }
+
+        .tooltip-arrow::before {
+            visibility: visible;
+            content: '';
+            transform: rotate(45deg);
+        }
+
+        .tooltip[data-popper-placement^='top'] > .tooltip-arrow {
+            bottom: -4px;
+        }
+
+        .tooltip[data-popper-placement^='bottom'] > .tooltip-arrow {
+            top: -4px;
+        }
+
+        .tooltip[data-popper-placement^='left'] > .tooltip-arrow {
+            right: -4px;
+        }
+
+        .tooltip[data-popper-placement^='right'] > .tooltip-arrow {
+            left: -4px;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex flex-col items-center justify-center p-4">
@@ -72,7 +113,16 @@
                 <button id="optimize-button" class="bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                     Optimize
                 </button>
-                <div>
+                <div class="flex space-x-2">
+                    <div class="relative inline-block">
+                        <button id="chatgpt-button" class="bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 transition-colors opacity-50 cursor-not-allowed" disabled>
+                            <i class="fab fa-telegram"></i>
+                        </button>
+                        <div id="chatgpt-tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+                            Use optimized prompt in ChatGPT
+                            <div class="tooltip-arrow" data-popper-arrow></div>
+                        </div>
+                    </div>
                     <button id="copy-button" class="hidden bg-secondary text-white px-3 py-2 rounded-md hover:bg-green-600 transition-colors">
                         <i class="far fa-copy"></i>
                     </button>
